@@ -94,14 +94,15 @@ class SkypeLevelDBReader (Reader):
         return res
 
     def read_array_lower(self):
-        raise NotImplementedError
         #print(self.pos)
         _len=self.read_int()
-        res=[self.read_something() for i in range(_len)]
+##        if _len!=0:
+##            raise NotImplementedError
+        res=[self.read_something() for i in range(_len*2)]
         assert self.read_bytes(1)==b'@'
         assert self.read_int()==_len
         assert self.read_int()==_len
-        return res
+        return {k:v for k,v in zip(res[::2],res[1::2])}
 
     def not_implemented(self):
         raise NotImplementedError
@@ -130,6 +131,6 @@ if __name__=='__main__':
             y.append(r.read_something())
             assert r.pos==len(r.s)
         except NotImplementedError:
-            print(n,r.pos-1,chr(r.s[r.pos-1]))
-##    with open('res.json','wt') as fp:
-##        json.dump(y,fp)
+            print(n,r.pos-2,r.s[r.pos-2:r.pos-2+20])
+    with open('res.json','wt') as fp:
+        json.dump(y,fp)
