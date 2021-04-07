@@ -108,9 +108,17 @@ class SkypeLevelDBReader (Reader):
         raise NotImplementedError
 
 if __name__=='__main__':
+    #for json output
     import json
+    #for sys.argv
+    import sys
+    #the python leveldb wrapper itself
     import plyvel
-    path='/home/user/work/skype_db/IndexedDB/file__0.indexeddb.leveldb'
+    path=sys.argv[1]
+    #we need some custom comparator
+    #because there is no comparator in the skype
+    #leveldb database
+    #and it (the python wrapper) throws an error in this case
     def comparator(a,b):
         for i,j in zip(a,b):
             if i>j:return 1
@@ -119,18 +127,33 @@ if __name__=='__main__':
         if len(a)>len(b):return 1
         if len(a)<len(b):return -1
         return 0
+    #we open the db
     db = plyvel.DB(path,comparator=comparator,comparator_name=b'idb_cmp1')
+    #and read it
     x=list(db)
+    #and we close the db
+    db.close()
+    #this step is unneeded
     x_=sorted(x,key=lambda x:-len(x[1]))
+    #the result
     y=[]
+    #n is for debugging purposes
+    #we also don't use k here
     for n,(k,v) in enumerate(x_):
+        #init the reader
         r=SkypeLevelDBReader(v)
+        #seek to the start (most likely there will be an object -- 'o'
         if not r.seek_substr(b'\xff\x14\xff\r'):
+            #skip if there's no b'\xff\x14\xff\r'
             continue
         try:
+            #this does the thing
             y.append(r.read_something())
+            #ensure we have read all this
             assert r.pos==len(r.s)
         except NotImplementedError:
+            #for debugging
             print(n,r.pos-2,r.s[r.pos-2:r.pos-2+20])
-    with open('res.json','wt') as fp:
+    #output
+    with open(sys.argv[2],'wt') as fp:
         json.dump(y,fp)
