@@ -12,7 +12,8 @@ json file by any aprporiate software, say firefox.
 It's highly recommended that you make a leveldb copy first, then apply
 the program _to the copy made_ -- it's more safe.
 
-You may also need to install the python leveldb wrapper [`plyvel`]() along
+You may also need to install the python leveldb wrapper 
+[`plyvel`](https://plyvel.readthedocs.io/en/latest/) along
 with the libraries it needs (the leveldb engine binaries itself).
 ### Skype message leveldb value format
  at least the leveldb values that contain `ff 14 ff 0d` also contain some
@@ -54,4 +55,4 @@ then `@` and number of entries (byte or varint) repeated 2 times
 ### Example
 TODO
 ### Further reading
-Skype 8 support database location answer [here](https://answers.microsoft.com/en-us/skype/forum/all/where-are-the-chat-messages-stored-on-the-local/04051ee2-56c2-4761-ba42-ea4bd11668b5?auth=1&page=2)
+Skype 8 support database location answer [here](https://answers.microsoft.com/en-us/skype/forum/all/where-are-the-chat-messages-stored-on-the-local/04051ee2-56c2-4761-ba42-ea4bd11668b5?auth=1&page=2).
