@@ -1,12 +1,16 @@
 ### Abstract
 It's a skype leveldb binary values reader. It reads only the entires
-with `ff 14 ff 0d` somewhere near to the value start and puts them 
+with `ff 14 ff 0d` (`ff 13 ff 0d` for windows) somewhere near to the value start and puts them 
 into json array ouput. Didn't have much desire to try to recover the
 rest database format along with some bytes preceding `ff 14 ff 0d`.
 ### How to use it
 It's a standalone python3 file which uses `sys.argv`, so  
 `python3 skype\_leveldb\_reader.py path\_to\_skype\_leveldb output.json`  
-would be sufficent. Then it's possible to open the resulting
+would be sufficent.  
+It requires the third parameter -- encoding codepage, when working with windows skype leveldb, because of `\xc9` 'copyright' character in the `"` strings somewhere. So for windows  
+`python3 skype\_leveldb\_reader.py path\_to\_skype\_leveldb output.json cp1251`  
+works fine now.  
+Then it's possible to open the resulting
 json file by any aprporiate software, say firefox.
 
 It's highly recommended that you make a leveldb copy first, then apply

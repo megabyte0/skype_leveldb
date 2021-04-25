@@ -31,6 +31,9 @@ class Reader:
 import struct
 OBJECT_END = 'stop_object'
 class SkypeLevelDBReader (Reader):
+    def __init__(self,s,encoding='utf-8'):
+        super(SkypeLevelDBReader,self).__init__(s)
+        self.encoding=encoding
     def read_int(self):
         res=[]
         while True:
@@ -46,7 +49,7 @@ class SkypeLevelDBReader (Reader):
         return struct.unpack('<d',self.read_bytes(8))[0]
     def read_str(self):
         _len=self.read_int()
-        return self.copy_bytes(_len).decode()
+        return self.copy_bytes(_len).decode(self.encoding)
     def read_unicode(self):
         _len=self.read_int()
         raw_str=self.copy_bytes(_len)
@@ -114,7 +117,11 @@ if __name__=='__main__':
     import sys
     #the python leveldb wrapper itself
     import plyvel
-    path=sys.argv[1]
+    path=(
+        #'/home/user/work/skype_db/1/IndexedDB/file__0.indexeddb.leveldb'
+        #'/home/user/work/skype_db/3_win/file__0.indexeddb.leveldb'
+        sys.argv[1]
+        )
     #we need some custom comparator
     #because there is no comparator in the skype
     #leveldb database
@@ -135,16 +142,23 @@ if __name__=='__main__':
     db.close()
     #this step is unneeded
     x_=sorted(x,key=lambda x:-len(x[1]))
+    #encoding
+    encoding=(
+        'utf-8' if len(sys.argv)<=3 else sys.argv[3]
+        #'cp1251'
+        )
     #the result
     y=[]
     #n is for debugging purposes
     #we also don't use k here
     for n,(k,v) in enumerate(x_):
         #init the reader
-        r=SkypeLevelDBReader(v)
+        r=SkypeLevelDBReader(v,encoding)
         #seek to the start (most likely there will be an object -- 'o'
-        if not r.seek_substr(b'\xff\x14\xff\r'):
+        if (not r.seek_substr(b'\xff\x14\xff\r')
+            and not r.seek_substr(b'\xff\x13\xff\r')):
             #skip if there's no b'\xff\x14\xff\r'
+            #or b'\xff\x14\xff\r' for windows
             continue
         try:
             #this does the thing
